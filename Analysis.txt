@@ -1,0 +1,56 @@
+Numerical Features:-
+1. temp
+2. dew
+3. humidity
+4. precip
+5. snow
+6. snowdepth
+7. windspeed
+8. cloudcover
+9. visibility
+
+Categorical Features:-
+1. holiday
+2. weekday
+3. summertime
+4. hour_of_day --- These are temporal in nature
+5. day_of_week --- and have cyclic nature. Thus
+6. month --------- will be decomposed into sine
+
+----------------------------------------------------------------------------------------------
+
+Trend to need an increase in the availability of bicycles:-
+- wrt. hour, day and month
+- wrt. weekdays and holidays
+- wrt. weather
+
+-- Monday-Friday
+-- High demand of bikes between 6AM and 9PM
+-- Demand peaks between 5PM AND 7PM.
+-- Demand flatline <6AM and >9PM.
+
+-- Weekends
+-- Consistent high demand for bikes between 8AM to 8PM.
+
+-- Holidays
+-- High demand for bikes between 9AM and 5PM.
+-- Peaks at around 12PM and 3PM.
+
+-- Conditions favoring high bike demand
+-- higher temperatures
+-- higher dew point
+-- low relative humidity
+-- higher windspeed
+
+----------------------------------------------------------------------------------------------
+
+-- Outliers
+-- precip
+-- windspeed
+-- snowdepth
+-- visibility
+
+----------------------------------------------------------------------------------------------
+
+-- Correlation
+-- temperature and dew are +vely correlated
