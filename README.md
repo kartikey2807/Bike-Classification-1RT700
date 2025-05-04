@@ -1,14 +1,13 @@
 # Bike Classification || 1RT700
-* Binary classification
-* Class Imbalance
-* SMOTE
-* Logistic Regression
+Given weather parameters like temperature, wind speed, dew, etc., plot trends and predict ```demand for bike usage```.    
+Add SMOTE and feature expansion to reduce model bias and better fit the training dataset. Report F1 score.
+
 ---
 
 ***Methods applied:-***
 * Logistic Regression
-* LR with SMOTE
-* LR with polynomial feature expansion
+* Regression with SMOTE (oversampling)
+* Regression with polynomial feature expansion
 ---
 
 ***Metrics:-***
