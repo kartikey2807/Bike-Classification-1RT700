@@ -6,6 +6,17 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import precision_score, recall_score, make_scorer, f1_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.dummy import DummyClassifier
+
+from utils import ce, feature_polynomial
+
+from imblearn.over_sampling import SMOTENC
+
 overall_df = pd.read_csv('training_data_fall2024.csv')
 
 int_features = [
@@ -26,11 +37,12 @@ con_features = [
 'windspeed',
 'cloudcover',
 'visibility']
-## ---------------------------------------------------------------------
 
-from sklearn.model_selection import train_test_split
-bike_df, bike_validation_df = train_test_split(overall_df,test_size=0.2,
-random_state=42,stratify=overall_df['increase_stock'])
+bike_df, bike_validation_df = \
+train_test_split(overall_df, 
+test_size=0.2, 
+random_state=42,
+stratify=overall_df['increase_stock'])
 
 ## Data Transformation
 ## Remove Nan values
@@ -49,7 +61,6 @@ bike_df['increase_stock'].replace(label_rep)
 
 bike_validation_df['increase_stock'] = \
 bike_validation_df['increase_stock'].replace(label_rep)
-## ---------------------------------------------------------------------
 
 ## Cyclic Encoding
 ## 1. convert temporal data into cyclic form
@@ -59,44 +70,31 @@ bike_validation_df['increase_stock'].replace(label_rep)
 ## One-Hot Encoding
 ## 1. applied to holiday, weekday and summertime
 
-def cyclical_encoding(df, T):
-    return np.sin(2*np.pi*df/T), np.cos(2*np.pi*df/T)
-
-bike_df['hour_of_day_sin'], bike_df['hour_of_day_cos'] = \
-cyclical_encoding(bike_df.loc[:,'hour_of_day'], T=24)
-bike_validation_df['hour_of_day_sin'], \
-bike_validation_df['hour_of_day_cos'] = \
-cyclical_encoding(bike_validation_df.loc[:,'hour_of_day'], T=24)
-
-bike_df['day_of_week_sin'], bike_df['day_of_week_cos'] = \
-cyclical_encoding(bike_df.loc[:,'day_of_week'], T=7)
-bike_validation_df['day_of_week_sin'], \
-bike_validation_df['day_of_week_cos'] = \
-cyclical_encoding(bike_validation_df.loc[:,'day_of_week'], T=7)
-
-bike_df['month_sin'],bike_df['month_cos'] = \
-cyclical_encoding(bike_df.loc[:, 'month'] - 1, T=12)
-bike_validation_df['month_sin'],bike_validation_df['month_cos'] = \
-cyclical_encoding(bike_validation_df.loc[:, 'month'] - 1, T=12)
-## ---------------------------------------------------------------------
+for feature, time_duration in zip(['hour_of_day','day_of_week','month'],[24,7,12]):
+    bike_df[feature+'_sin'], bike_df[feature+'_cos'] =\
+    ce(bike_df.loc[:,feature], T = time_duration)
+    bike_validation_df[feature+'_sin'], bike_validation_df[feature+'_cos'] =\
+    ce(bike_validation_df.loc[:,feature], T = time_duration)
 
 ## delete the original columns
-bike_df = bike_df.drop(['hour_of_day', 'day_of_week', 'month'], axis=1)
-bike_validation_df = bike_validation_df.drop(['hour_of_day', 
-'day_of_week', 'month'], axis=1)
+bike_df = bike_df.drop(['hour_of_day','day_of_week', 'month'], axis=1)
+bike_validation_df = bike_validation_df.drop([
+'hour_of_day',
+'day_of_week', 
+'month'], axis=1)
 
-bike_df = pd.get_dummies(bike_df, 
-columns=['holiday','weekday','summertime'], dtype=int, drop_first=True)
-bike_validation_df = pd.get_dummies(bike_validation_df, 
-columns=['holiday','weekday','summertime'], dtype=int, drop_first=True)
+bike_df = pd.get_dummies(bike_df,
+columns=['holiday','weekday','summertime'],dtype=int, drop_first=True)
+bike_validation_df = pd.get_dummies(bike_validation_df,
+columns=['holiday','weekday','summertime'],dtype=int, drop_first=True)
+
 ## ---------------------------------------------------------------------
-
 def density_plot(df):
     fig, axes = plt.subplots(8,1,figsize=(15,50))
 
     for i in range(len(con_features)):
         axes[i].set_title(f'Probability Density[{con_features[i]}]')
-        sns.histplot(data=bike_df, x=bike_df.loc[:,con_features[i]], 
+        sns.histplot(data=bike_df, x=bike_df.loc[:,con_features[i]],
         stat='density', color='blue', bins=50, ax=axes[i], kde=True)
     plt.show()
 ## ---------------------------------------------------------------------
@@ -104,9 +102,9 @@ def density_plot(df):
 density_plot(bike_df)
 density_plot(bike_validation_df)
 
-from sklearn.preprocessing import StandardScaler
 scale = StandardScaler()
-bike_df.loc[:,con_features] = scale.fit_transform(X=bike_df.loc[:,con_features])
+bike_df.loc[:,con_features] = \
+scale.fit_transform(X=bike_df.loc[:,con_features])
 bike_validation_df.loc[:,con_features] = scale.transform(X=bike_validation_df.loc[:,con_features])
 ## ---------------------------------------------------------------------
 
@@ -114,11 +112,14 @@ density_plot(bike_df)
 density_plot(bike_validation_df)
 ## ---------------------------------------------------------------------
 
-bike_df = bike_df.drop(['snow','dew'], axis=1)
-bike_validation_df = bike_validation_df.drop(['snow','dew'], axis=1)
+to_drop = [
+'snow',
+'dew',
+'weekday_1',
+'summertime_1']
 
-bike_df = bike_df.drop(['weekday_1','summertime_1'], axis=1)
-bike_validation_df = bike_validation_df.drop(['weekday_1','summertime_1'], axis=1)
+bike_df = bike_df.drop(to_drop, axis=1)
+bike_validation_df = bike_validation_df.drop(to_drop, axis=1)
 
 ## Data Modeling
 ## 1. Apply Naive classfier
@@ -137,11 +138,6 @@ y_train = np.array(bike_df['increase_stock'])
 X_valid = np.array(bike_validation_df.drop(['increase_stock'], axis=1))
 y_valid = np.array(bike_validation_df['increase_stock'])
 
-
-from sklearn.dummy import DummyClassifier
-
-
-
 dummy_classifier = DummyClassifier(strategy='constant', constant=0, random_state=42)
 dummy_classifier.fit(X_train, y_train)
 ## ---------------------------------------------------------------------
@@ -153,12 +149,6 @@ dummy_classifier.fit(X_train, y_train)
 ## solver
 ## max_iter
 ## class_weights
-
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import precision_score, recall_score, make_scorer, f1_score
-
-
 
 params = {
 'penalty': ['l1','l2', 'elasticnet', None],
@@ -181,54 +171,11 @@ grid_search.fit(X_train, y_train)
 ## SMOTE
 ## oversampling the high_bike_demand class
 
-from imblearn.over_sampling import SMOTENC
-over_sample = SMOTENC(categorical_features= [13], sampling_strategy=0.4,
-random_state=42)
+over_sample = SMOTENC(categorical_features= [13], sampling_strategy=0.4, random_state=42)
 X_train_resample, y_train_resample = over_sample.fit_resample(X_train, y_train)
 
 grid_search.fit(X_train_resample, y_train_resample)
 ## ---------------------------------------------------------------------
-
-## Feature expansion
-## Numerical features to combine:-
-## temp and humidity
-## temp and precip
-## temp and windspeed
-## temp and snowdepth
-## humidity and precip
-## humidity and windspeed
-## precip and snowdepth
-## precip and cloudcover
-## precip and windspeed
-## precip and visibility
-## windspeed and cloudcover
-## ---------------------------------------------------------------------
-## Categorical features to combine:-
-## 
-## hour_of_day and day_of_week
-## day_of_week and month
-## hour_of_day and month
-
-def feature_polynomial(X):
-
-    return np.concatenate((X,
-        (X[:,0]*X[:,1]).reshape((X.shape[0],1)),
-        (X[:,0]*X[:,2]).reshape((X.shape[0],1)),
-        (X[:,0]*X[:,4]).reshape((X.shape[0],1)),
-        (X[:,0]*X[:,3]).reshape((X.shape[0],1)),
-        (X[:,1]*X[:,2]).reshape((X.shape[0],1)),
-        (X[:,1]*X[:,4]).reshape((X.shape[0],1)),
-        (X[:,2]*X[:,3]).reshape((X.shape[0],1)),
-        (X[:,2]*X[:,5]).reshape((X.shape[0],1)),
-        (X[:,2]*X[:,4]).reshape((X.shape[0],1)),
-        (X[:,2]*X[:,6]).reshape((X.shape[0],1)),
-        (X[:,4]*X[:,5]).reshape((X.shape[0],1)),
-        (X[:,7]*X[:,9]).reshape((X.shape[0],1)),
-        (X[:,8]*X[:,10]).reshape((X.shape[0],1)),
-        (X[:,7]*X[:,11]).reshape((X.shape[0],1)),
-        (X[:,8]*X[:,12]).reshape((X.shape[0],1)),
-        (X[:,9]*X[:,11]).reshape((X.shape[0],1)),
-        (X[:,10]*X[:,12]).reshape((X.shape[0],1))), axis=1)
 
 X_train_fe = feature_polynomial(X_train)
 X_valid_fe = feature_polynomial(X_valid)
