@@ -13,7 +13,7 @@ from sklearn.metrics import precision_score, recall_score, make_scorer, f1_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.dummy import DummyClassifier
 
-from utils import ce, feature_polynomial
+from utils import ce, feature_polynomial, density_plot
 
 from imblearn.over_sampling import SMOTENC
 
@@ -88,29 +88,18 @@ columns=['holiday','weekday','summertime'],dtype=int, drop_first=True)
 bike_validation_df = pd.get_dummies(bike_validation_df,
 columns=['holiday','weekday','summertime'],dtype=int, drop_first=True)
 
-## ---------------------------------------------------------------------
-def density_plot(df):
-    fig, axes = plt.subplots(8,1,figsize=(15,50))
 
-    for i in range(len(con_features)):
-        axes[i].set_title(f'Probability Density[{con_features[i]}]')
-        sns.histplot(data=bike_df, x=bike_df.loc[:,con_features[i]],
-        stat='density', color='blue', bins=50, ax=axes[i], kde=True)
-    plt.show()
-## ---------------------------------------------------------------------
-
-density_plot(bike_df)
-density_plot(bike_validation_df)
+density_plot(bike_df, con_features)
+density_plot(bike_validation_df, con_features)
 
 scale = StandardScaler()
 bike_df.loc[:,con_features] = \
 scale.fit_transform(X=bike_df.loc[:,con_features])
 bike_validation_df.loc[:,con_features] = scale.transform(X=bike_validation_df.loc[:,con_features])
-## ---------------------------------------------------------------------
+## ------------------------
 
-density_plot(bike_df)
-density_plot(bike_validation_df)
-## ---------------------------------------------------------------------
+density_plot(bike_df, con_features)
+density_plot(bike_validation_df, con_features)
 
 to_drop = [
 'snow',
@@ -130,7 +119,6 @@ bike_validation_df = bike_validation_df.drop(to_drop, axis=1)
 ## 1. Accuracy
 ## 2. F1 score
 ## 3. Precision and Recall
-## ---------------------------------------------------------------------
 
 X_train = np.array(bike_df.drop(['increase_stock'], axis=1))
 y_train = np.array(bike_df['increase_stock'])
@@ -140,7 +128,7 @@ y_valid = np.array(bike_validation_df['increase_stock'])
 
 dummy_classifier = DummyClassifier(strategy='constant', constant=0, random_state=42)
 dummy_classifier.fit(X_train, y_train)
-## ---------------------------------------------------------------------
+## ------------------------
 
 ## Vanilla regression
 ## Hyper-parameters to fine-tune
@@ -156,7 +144,7 @@ params = {
 'max_iter': [1,3,5,10,50,75,100],
 'class_weight': [None,'balanced',{1:1.25,0:1},{1:1.5,0:1},{1:2,0:1},{1:2.25,0:1},{1:2.5,0:1}],
 'solver': ['lbfgs','liblinear','newton-cg','newton-cholesky','saga']}
-## ---------------------------------------------------------------------
+## ------------------------
 
 logistic_regression = LogisticRegression(random_state=42)
 grid_search = GridSearchCV(estimator=logistic_regression, 
@@ -166,7 +154,6 @@ verbose=1,
 scoring='f1')
 
 grid_search.fit(X_train, y_train)
-## ---------------------------------------------------------------------
 
 ## SMOTE
 ## oversampling the high_bike_demand class
@@ -175,10 +162,8 @@ over_sample = SMOTENC(categorical_features= [13], sampling_strategy=0.4, random_
 X_train_resample, y_train_resample = over_sample.fit_resample(X_train, y_train)
 
 grid_search.fit(X_train_resample, y_train_resample)
-## ---------------------------------------------------------------------
 
 X_train_fe = feature_polynomial(X_train)
 X_valid_fe = feature_polynomial(X_valid)
 
 grid_search.fit(X_train_fe, y_train)
-## ---------------------------------------------------------------------

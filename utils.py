@@ -1,4 +1,7 @@
 import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 ## Feature expansion
 ## Numerical features to combine:-
@@ -13,7 +16,7 @@ import numpy as np
 ## precip and windspeed
 ## precip and visibility
 ## windspeed and cloudcover
-## ---------------------------------------------------------------------
+## ------------------------
 ## Categorical features to combine:-
 ## 
 ## hour_of_day and day_of_week
@@ -43,4 +46,13 @@ def feature_polynomial(X):
 def ce(df, T): ## cyclic encoding
     if T == 12:
         df = df - 1
-    return np.sin(2*np.pi*df/T), np.cos(2*np.pi*df/T)
+    return np.sin(2*np.pi*df/T),np.cos(2*np.pi*df/T)
+
+def density_plot(df, con_features): ## plot the density of continuous features
+    fig, axes = plt.subplots(8,1, figsize = (15,50))
+
+    for i in range(len(con_features)):
+        sns.histplot(data=df,
+        x=df.loc[:, con_features[i]], stat='density',
+        color='blue', bins=50, ax=axes[i], kde=True)
+    plt.show()

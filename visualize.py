@@ -1,5 +1,5 @@
 import warnings
-warnings.filewarnings('ignore')
+warnings.filterwarnings('ignore')
 
 import numpy as np
 import pandas as pd
@@ -33,6 +33,8 @@ con_features = [
 
 bike_df, bike_validation_df = train_test_split(overall_df,test_size=0.2,
 random_state=42,stratify=overall_df['increase_stock'])
+## ------------------------
+
 ## print(bike_df.shape)
 ## print(bike_df['increase_stock].value_counts())
 
@@ -51,14 +53,14 @@ temp.pop(-1) ## cloudcover
 temp.pop(-2) ## snowdepth
 
 plt.figure(figsize=(15,15))
-sns.pairplot(data=bike_df,vars=con_features,kind='scatter')
-## ---------------------------------------------------------------------
+sns.pairplot(data=bike_df, vars=con_features, kind='scatter')
+## ------------------------
 
 plt.figure(figsize=(15,15))
 plt.title('Heatmap estimate of features')
-bike_cm = bike_df[:,con_features].corr()
+bike_cm = bike_df.loc[:,con_features].corr()
 sns.heatmap(bike_cm,annot=True,cmap='coolwarm',linewidth=0.2)
-## ---------------------------------------------------------------------
+
 
 ## Corralation
 ## temp, dew, 0.87
@@ -67,7 +69,6 @@ sns.heatmap(bike_cm,annot=True,cmap='coolwarm',linewidth=0.2)
 ## humidity, windspeed, -0.34
 ## humidity, visibility, -0.38
 ## precip, visibility, -0.51
-## ---------------------------------------------------------------------
 
 fig,axes = plt.subplots(2,2,figsize=(15,15))
 hue_label = [[None,'holiday'],
@@ -83,7 +84,7 @@ for i in range(2):
 
         axes[i,j].set_xlabel('Bike demand')
         axes[i,j].set_ylabel('Count')
-## ---------------------------------------------------------------------
+## ------------------------
 
 fig,axes = plt.subplots(7,1,figsize=(15,40))
 
@@ -98,7 +99,6 @@ for val in bike_df['day_of_week'].sort_values().unique():
     x=bike_df.loc[:,'hour_of_day'],
     y=bike_df.loc[indexes,'increase_stock'].replace(label_rep),
     estimator='mean', ax=axes[int(val)], errorbar=('ci',False))
-## ---------------------------------------------------------------------
 
 plt.figure(figsize=(15,15))
 
@@ -107,8 +107,6 @@ x=bike_df.loc[:,'hour_of_day'],
 y=bike_df.loc[:,'increase_stock'].replace(label_rep),
 hue='holiday', estimator='mean', 
 errorbar=('ci',False))
-## ---------------------------------------------------------------------
-
 plt.figure(figsize=(15,5))
 
 sns.lineplot(data=bike_df,
@@ -119,7 +117,6 @@ estimator='mean',errorbar=('ci',False))
 plt.title('Instances of high bike demand vs Months')
 plt.xlabel('Months')
 plt.ylabel('High bike demand instances')
-## ---------------------------------------------------------------------
 
 con_features_np = np.array(con_features).reshape(4,2)
 fig, axes = plt.subplots(4,2,figsize=(15,30))
@@ -135,7 +132,6 @@ for i in range(4):
 
         axes[i,j].set_xlabel('Bike Demand')
         axes[i,j].set_ylabel(f'{con_features_np[i,j]}')
-## ---------------------------------------------------------------------
 
 ## labels vs continuous variables
 ## we can drop
@@ -153,7 +149,7 @@ for i in range(4):
 
         axes[i,j].set_xlabel('Bike Demand')
         axes[i,j].set_ylabel(f'{con_features_np[i,j]}')
-## ---------------------------------------------------------------------
+## ------------------------
 
 ## Observation 1.1
 ## 1. temp and dew have linear +ve correlation.
@@ -181,4 +177,4 @@ for i in range(4):
 ## 3. low relative humidity
 ## 4. higher median windspeed
 ## 5. Outliers exists for precip, windspeed, snowdepth and visibility.
-## ---------------------------------------------------------------------
+## ------------------------
