@@ -6,24 +6,23 @@ better than models like vanilla regression and ```SMOTE-regression```. To replic
 execute the `model.py` file.
 
 ---
-***Observations***   
+**Observations**    
 > Monday - Friday (Weekdays)
-* High demand for bikes between 6 AM and 9 PM.
-* Demand peaks between 5 PM AND 7 PM.
-* Demand flatlines < 6 AM and > 9 PM.
+> * High demand for bikes between 6 AM and 9 PM.
+> * Demand peaks between 5 PM AND 7 PM.
+> * Demand flatlines < 6 AM and > 9 PM.
 
 > Saturday and Sunday (Weekends)
-* Consistently high demand from 8 AM to 8 PM.
+> * Consistently high demand from 8 AM to 8 PM.
 
 > Holidays
-* High demand for bikes between 9 AM and 5 PM.
-* Peaks at around 12 PM and 3 PM.
+> * High demand for bikes between 9 AM and 5 PM.
+> * Peaks at around 12 PM and 3 PM.
 
-> Correlation
-* Temperature and dew are highly positively correlated.
-
+> Correlations
+> * Temperature and dew are highly positively correlated.
 ---
-***Results***
+**Results**
 | Model | F1-score on validation set |
 | :- | :- |
 | Logistic Regression | 0.85 |
