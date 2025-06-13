@@ -1,9 +1,9 @@
 # Bike Classification || 1RT700
-Given weather parameters like temperature, wind speed, dew, etc., plot trends and predict **'demand for bike usage'**.    
+Given weather parameters like temperature, wind speed, dew, etc., plot trends and predict **'demand for bike usage'**    
 Add SMOTE and Feature expansion to reduce model bias and better fit the training dataset. Report precision, recall,    
-and f1-score to compare model performance. Regression model with ```feature expansion``` was observed to perform   
-better than models like vanilla regression and ```SMOTE-regression```. To replicate the results, clone the repository, then   
-execute the `model.py` file.
+and f1-score to compare model performance. Regression model with `feature expansion` was observed to perform   
+better than models like `vanilla` regression and `SMOTE` regression. To replicate the results, git clone the repository,    
+and run the `modey.py` file.
 
 ---
 **Observations**    
@@ -25,6 +25,6 @@ execute the `model.py` file.
 **Results**
 | Model | F1-score on validation set |
 | :- | :- |
+| Regression with feature expansion | 0.86 |
 | Logistic Regression | 0.85 |
 | Regression with SMOTE | 0.82 |
-| Regression with feature expansion | 0.86 |
