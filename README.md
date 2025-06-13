@@ -6,7 +6,7 @@ better than models like `vanilla` regression and `SMOTE` regression. To replicat
 and run the `modey.py` file.
 
 ---
-**Observations**    
+**Analysis**    
 > Monday - Friday (Weekdays)
 > * High demand for bikes between 6 AM and 9 PM.
 > * Demand peaks between 5 PM AND 7 PM.
