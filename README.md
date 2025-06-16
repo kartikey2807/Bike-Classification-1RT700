@@ -2,7 +2,7 @@
 * Given weather parameters like temperature, wind speed, dew, etc.
 * Plot trends and predict *demand in bike*
 * Use logistic regression
-* Add SMOTE and polynomial Feature Expansion
+* Add SMOTE and **polynomial** Feature Expansion
 * This can better fit training data and reduce bias
 * Metrics to report: F1-score
 
