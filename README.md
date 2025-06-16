@@ -1,26 +1,11 @@
-# Bike Classification || 1RT700
-Given weather parameters like temperature, wind speed, dew, etc., plot trends and predict **'demand for bike usage'**    
-Add SMOTE and Feature expansion to reduce model bias and better fit the training dataset. Report precision, recall,    
-and f1-score to compare model performance. Regression model with `feature expansion` was observed to perform   
-better than models like `vanilla` regression and `SMOTE` regression. To replicate the results, git clone the repository,    
-and run the `modey.py` file.
+# Bike Classification
+* Given weather parameters like temperature, wind speed, etc.
+* Plot trends and predict *demand in bike*
+* Use logistic regression
+* Add SMOTE and polynomial Feature Expansion
+* This can better fit training data and reduce bias
+* Metrics to report: F1-score
 
----
-**Analysis**    
-> Monday - Friday (Weekdays)
-> * High demand for bikes between 6 AM and 9 PM.
-> * Demand peaks between 5 PM AND 7 PM.
-> * Demand flatlines < 6 AM and > 9 PM.
-
-> Saturday and Sunday (Weekends)
-> * Consistently high demand from 8 AM to 8 PM.
-
-> Holidays
-> * High demand for bikes between 9 AM and 5 PM.
-> * Peaks at around 12 PM and 3 PM.
-
-> Correlations
-> * Temperature and dew are highly positively correlated.
 ---
 **Results**
 | Model | F1-score on validation set |
